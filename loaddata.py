@@ -158,9 +158,3 @@ def load_temp(name, end_date, key, start_date = "6-DEC-2009", frequency = 24):
     trj = trj.drop(["index"], axis=1)
     return  trj #returns dataframe
 
-
-def to_years(week, t0):
-    return int(t0.year+(t0.isocalendar()[1]+week)/52.1429)
-
-def week_range(n_weeks, t0):
-    return int(to_years(np.arange(n_weeks), t0))
