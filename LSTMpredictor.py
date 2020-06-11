@@ -90,6 +90,7 @@ class LSTMpredictor:
         series_s = ts.copy()
         for i in range(self.n_prev):
             ts = pd.concat([ts, series_s.shift(-(i+1))], axis = 1)
+            #ts = pd.concat([ts, series_s.shift((i+1)).fillna(0)], axis = 1)
 
         ts.dropna(axis=0, inplace=True)
         return ts, scaler
@@ -215,7 +216,7 @@ class LSTMpredictor:
             
         return pred_trj
 
-    def pred_with_fit(self, trj, value, start, n_steps, steps_fit = 1, filename = 'lstmpredicter.h5'):
+    def pred_with_fit(self, trj, value, start, n_steps, steps_fit = 1, epochs_fit = 5, filename = 'lstmpredicter.h5'):
         
         self.model = load_model(filename)
 
@@ -245,7 +246,7 @@ class LSTMpredictor:
             if i % int(steps_fit) == 0:
                 timeseries, scaler = self.create_ts(df[:i], value = "x")
                 train_X, train_y, test_X, test_y = self.train_test(timeseries, cut = len(pred_trj))
-                self.model.fit(train_X, train_y, epochs=5, shuffle=True, batch_size = 512, verbose = verbose)
+                self.model.fit(train_X, train_y, epochs=epochs_fit, shuffle=True, batch_size = 512, verbose = verbose)
                 
         if self.verbose_plot:
             plt.plot(pred_trj[cut:], label = "prediction")  
