@@ -94,7 +94,7 @@ class LSTMpredictor:
 
         ts.dropna(axis=0, inplace=True)
         return ts, scaler
-
+    
 
     def train_test(self, ts, cut): 
         train = ts.iloc[:cut, :]
@@ -134,8 +134,6 @@ class LSTMpredictor:
         model.compile(loss="mse", optimizer="rmsprop")
         model.summary()
 
-        model.compile(optimizer='rmsprop', loss="mse")
-
         timeseries, scaler = self.create_ts(trj = trj, value = value)
 
         train_X, train_y, test_X, test_y = self.train_test(timeseries, cut = self.cut)
@@ -148,7 +146,7 @@ class LSTMpredictor:
             verbose = 0
         else:
             verbose = 1
-        model.fit(train_X, train_y, epochs=epochs, shuffle=True, batch_size = batch_size, verbose = verbose)
+        model.fit(train_X, train_y, epochs=epochs, shuffle=False, batch_size = batch_size, verbose = verbose)
         #model.fit(train_X, train_y, epochs=100, shuffle=True, 
               #validation_data=(test_X, test_y), batch_size = 32)
         print("> Compilation Time : ", time.time() - start)
@@ -202,6 +200,7 @@ class LSTMpredictor:
         pred_trj[:cut]=trj[value].values[:cut]
         for i in range(cut,n_steps+cut):
             X=(pred_trj[(i-self.n_prev):i]).reshape((1,self.n_prev))
+          
             pred=self.model.predict(scaler.transform(X).reshape((1,self.n_prev,1)))
             pred_trj[i]=scaler.inverse_transform(pred)[0,0] # get the value from the numpy 2D array and append to predictions
         
